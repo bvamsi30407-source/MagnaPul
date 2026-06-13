@@ -14,7 +14,8 @@ import {
   Cpu, 
   Award,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  Smartphone
 } from "lucide-react";
 
 // ==========================================
@@ -483,6 +484,7 @@ export default function App() {
     return Number(localStorage.getItem("magnapull_highdepth") || "0");
   });
   const [musicMuted, setMusicMuted] = useState<boolean>(false);
+  const [isPortrait, setIsPortrait] = useState<boolean>(false);
   
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -533,6 +535,21 @@ export default function App() {
     const d = localStorage.getItem("magnapull_highdepth");
     if (s) setHighScore(Number(s));
     if (d) setHighDepth(Number(d));
+  }, []);
+
+  // Monitor screen orientation changes for portrait warning
+  useEffect(() => {
+    const handleResize = () => {
+      // isPortrait is true if viewport height is strictly greater than width
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
   }, []);
 
 
@@ -1830,6 +1847,25 @@ export default function App() {
     <div className="w-full min-h-screen bg-[#020617] flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none overflow-hidden relative">
       {/* BACKGROUND INDUSTRIAL GRID EFFECTS */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.15)_0%,rgba(2,6,23,0.85)_100%)] pointer-events-none" />
+
+      {/* PORTRAIT WARNING OVERLAY */}
+      {isPortrait && (
+        <div id="portrait-orientation-warning" className="fixed inset-0 z-50 bg-[#020617] flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+          <div className="w-16 h-16 rounded-2xl bg-orange-500/10 border-2 border-orange-500 flex items-center justify-center text-orange-500 mb-6 shadow-[0_0_40px_rgba(249,115,22,0.25)] animate-bounce shrink-0">
+            <Smartphone className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-extrabold text-slate-100 tracking-tight uppercase mb-2">
+            Rotate Device to Landscape
+          </h2>
+          <p className="font-mono text-xs sm:text-sm text-orange-400 tracking-wider max-w-sm mb-6 leading-relaxed">
+            Rotate device to Landscape for optimal extraction and electromagnetic telemetry calibration.
+          </p>
+          <div className="w-16 h-0.5 border-t border-dashed border-slate-700 mb-5" />
+          <p className="text-[10px] text-slate-500 font-mono">
+            MAGNA-PULL INDUSTRIAL RETRIEVAL SYSTEM
+          </p>
+        </div>
+      )}
 
 
 
