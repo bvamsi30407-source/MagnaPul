@@ -1911,67 +1911,67 @@ export default function App() {
             SCREEN CASE 1: TITLE/START MENU OVERLAY
            ========================================== */}
         {gameMode === "TITLE" && (
-          <div className="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-start sm:justify-center p-3 sm:p-6 z-30 font-sans text-center transition-all overflow-y-auto max-h-full">
+          <div className="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-2 sm:p-6 z-30 font-sans text-center transition-all max-h-full">
             {/* Visual Header Motif */}
-            <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-2xl bg-orange-500/10 border-2 border-orange-500 flex items-center justify-center text-orange-500 mt-2 sm:mt-0 mb-3 sm:mb-6 shadow-[0_0_30px_rgba(249,115,22,0.25)] animate-bounce shrink-0">
-              <Zap className="w-5 h-5 sm:w-8 sm:h-8 font-extrabold" />
+            <div className="hidden min-[400px]:flex w-6 h-6 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-500 mb-1.5 sm:mb-6 shadow-[0_0_20px_rgba(249,115,22,0.15)] animate-bounce shrink-0">
+              <Zap className="w-3.5 h-3.5 sm:w-8 sm:h-8 font-extrabold" />
             </div>
 
-            <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-100 tracking-tight leading-none mb-1 sm:mb-2 select-none uppercase font-sans shrink-0">
+            <h1 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-100 tracking-tight leading-none mb-0.5 sm:mb-2 select-none uppercase font-sans shrink-0">
               MAGNA-PULL
             </h1>
-            <p className="font-mono text-[9px] sm:text-xs md:text-sm tracking-widest text-orange-400 font-medium mb-3 sm:mb-6 shrink-0">
+            <p className="font-mono text-[8px] sm:text-xs md:text-sm tracking-widest text-orange-400 font-medium mb-2.5 sm:mb-6 shrink-0">
               SUB-SURFACE PLASMA CORES HARVESTING OPERATION
             </p>
 
-            {/* Instruction Layout Grid - Keep 3-columns always to optimize vertical space on mobile and landscape */}
-            <div className="w-full max-w-[720px] grid grid-cols-3 gap-1.5 sm:gap-3 md:gap-4.5 mb-3 sm:mb-6 text-left text-[8px] sm:text-[10px] md:text-xs shrink-0">
-              <div className="bg-slate-900/60 border border-slate-850 p-1.5 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
+            {/* Instruction Layout Grid */}
+            <div className="w-full max-w-[700px] grid grid-cols-3 gap-1 sm:gap-3 md:gap-4.5 mb-2.5 sm:mb-6 text-left shrink-0">
+              <div className="bg-slate-900/40 border border-slate-850 p-1 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
                 <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
-                  <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-[8px] sm:text-xs shrink-0">1</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[8px] sm:text-xs">Sling Probe</h3>
+                  <div className="w-3 h-3 sm:w-6 sm:h-6 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-[7px] sm:text-xs shrink-0">1</div>
+                  <h3 className="font-bold text-slate-200 uppercase tracking-divider text-[7px] sm:text-xs">Sling Probe</h3>
                 </div>
-                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[8px] sm:text-[11px] md:text-xs">
-                  Touch & drag backward anywhere on the viewport, then release to launch a high-speed magnetic probe deep into the jagged shaft.
+                <p className="text-slate-400 leading-tight sm:leading-relaxed text-[7px] sm:text-[11px] md:text-xs">
+                  Drag back & release to launch magnetic probe deep.
                 </p>
               </div>
 
-              <div className="bg-slate-900/60 border border-slate-850 p-1.5 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
-                  <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[8px] sm:text-xs shrink-0">2</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[8px] sm:text-xs">Magnet Latch</h3>
+              <div className="bg-slate-900/40 border border-slate-850 p-1 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
+                  <div className="w-3 h-3 sm:w-6 sm:h-6 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[7px] sm:text-xs shrink-0">2</div>
+                  <h3 className="font-bold text-slate-200 uppercase tracking-divider text-[7px] sm:text-xs">Latch</h3>
                 </div>
-                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[8px] sm:text-[11px] md:text-xs">
-                  Bypass the static walls and rotators. As soon as the probe makes contact with the Core, a permanent tether field is activated.
+                <p className="text-slate-400 leading-tight sm:leading-relaxed text-[7px] sm:text-[11px] md:text-xs">
+                  Automatic connection on core contact.
                 </p>
               </div>
 
-              <div className="bg-slate-900/60 border border-slate-850 p-1.5 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
-                  <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-[8px] sm:text-xs shrink-0">3</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[8px] sm:text-xs">The Pull</h3>
+              <div className="bg-slate-900/40 border border-slate-850 p-1 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
+                  <div className="w-3 h-3 sm:w-6 sm:h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-[7px] sm:text-xs shrink-0">3</div>
+                  <h3 className="font-bold text-slate-200 uppercase tracking-divider text-[7px] sm:text-xs">The Pull</h3>
                 </div>
-                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[8px] sm:text-[11px] md:text-xs">
-                  Tap & hold anywhere to pull the heavy Core upward. Avoid crashing into hazardous explosive red barrels or disruptor zones!
+                <p className="text-slate-400 leading-tight sm:leading-relaxed text-[7px] sm:text-[11px] md:text-xs">
+                  Hold press anywhere to pull core upward.
                 </p>
               </div>
             </div>
 
             {/* Launch controls CTA */}
-            <div className="flex flex-col items-center gap-2 mb-3 sm:mb-4 shrink-0">
+            <div className="flex flex-col items-center mb-1.5 sm:mb-4 shrink-0">
               <button 
                 id="btn-engage-operation"
                 onClick={startGame}
-                className="group px-6 sm:px-8 py-2 sm:py-3.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold text-xs sm:text-lg uppercase tracking-wider rounded-xl cursor-pointer flex items-center gap-2 shadow-[0_4px_25px_rgba(249,115,22,0.35)] hover:shadow-[0_4px_30px_rgba(249,115,22,0.55)] transition-all hover:scale-[1.03]"
+                className="group px-4 sm:px-8 py-1.5 sm:py-3.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold text-[10px] sm:text-sm uppercase tracking-wider rounded-lg sm:rounded-xl cursor-pointer flex items-center gap-1.5 shadow-[0_4px_20px_rgba(249,115,22,0.3)] hover:shadow-[0_4px_35px_rgba(249,115,22,0.5)] transition-all hover:scale-[1.03]"
               >
                 INITIATE EXTRACTION
-                <ArrowRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
+                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </button>
             </div>
 
             {/* Secondary High Score reading */}
             {highScore > 0 && (
-              <div className="mt-2 sm:mt-6 flex gap-4 text-[9px] sm:text-xs text-slate-500 font-mono pb-2 shrink-0">
+              <div className="mt-1.5 sm:mt-4 flex gap-4 text-[7px] sm:text-xs text-slate-500 font-mono pb-1 shrink-0">
                 <span>RECORD CORES CHRONICLED: <strong className="text-slate-300">{highScore}</strong></span>
                 <span>DEEPEST RECORD: <strong className="text-slate-300">{highDepth.toFixed(1)}M</strong></span>
               </div>
@@ -1983,55 +1983,55 @@ export default function App() {
             SCREEN CASE 2: CONVULSIVE GAMEOVER CARD
            ========================================== */}
         {gameMode === "GAMEOVER" && (
-          <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-start sm:justify-center p-4 sm:p-6 z-30 text-center animate-fade-in font-sans overflow-y-auto max-h-full">
-            <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-2xl bg-red-500/10 border-2 border-red-500 flex items-center justify-center text-red-500 mt-2 sm:mt-0 mb-3 sm:mb-5 shadow-[0_0_20px_rgba(239,68,68,0.2)] shrink-0">
-              <ShieldAlert className="w-5 h-5 sm:w-8 sm:h-8" />
+          <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-3 sm:p-6 z-30 text-center animate-fade-in font-sans max-h-full">
+            <div className="hidden min-[400px]:flex w-6 h-6 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500 mb-1.5 sm:mb-5 shadow-[0_0_20px_rgba(239,68,68,0.15)] shrink-0">
+              <ShieldAlert className="w-3.5 h-3.5 sm:w-8 sm:h-8" />
             </div>
 
-            <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-100 tracking-tight leading-none mb-1 select-none uppercase shrink-0">
+            <h2 className="text-base sm:text-4xl md:text-5xl font-extrabold text-slate-100 tracking-tight leading-none mb-0.5 select-none uppercase shrink-0">
               CONNECTION FLUID LOST
             </h2>
-            <p className="font-mono text-[9px] sm:text-xs text-red-400 tracking-widest uppercase mb-4 sm:mb-8 shrink-0">
+            <p className="font-mono text-[7px] sm:text-xs text-red-400 tracking-widest uppercase mb-2 sm:mb-8 shrink-0">
               Operations Cancelled — Core Integrity Compromised
             </p>
 
             {/* Scoreboard display */}
-            <div className="bg-slate-900 border border-slate-800 p-3 sm:p-6 rounded-xl sm:rounded-2xl w-full max-w-[420px] mb-4 sm:mb-8 font-sans grid grid-cols-2 gap-2 sm:gap-4 shrink-0">
-              <div className="flex flex-col items-center justify-center border-r border-slate-800 py-1 sm:py-1.5">
-                <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Cores Harvested</span>
-                <span className="text-2xl sm:text-4xl font-extrabold text-[#4ade80] font-mono leading-none tracking-tight">{score}</span>
+            <div className="bg-slate-900 border border-slate-800 p-2 sm:p-6 rounded-lg sm:rounded-2xl w-full max-w-[380px] mb-2.5 sm:mb-8 font-sans grid grid-cols-2 gap-2 sm:gap-4 shrink-0">
+              <div className="flex flex-col items-center justify-center border-r border-slate-800 py-0.5 sm:py-1.5">
+                <span className="text-[7px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Cores Harvested</span>
+                <span className="text-base sm:text-4xl font-extrabold text-[#4ade80] font-mono leading-none tracking-tight">{score}</span>
                 {score >= highScore && score > 0 && (
-                  <span className="text-[8px] sm:text-[9px] text-emerald-400 font-mono font-bold uppercase mt-1 sm:mt-1.5 flex items-center gap-0.5 animate-pulse">
-                    <Award className="w-2 sm:w-2.5 h-2 sm:h-2.5" /> NEW BEST!
+                  <span className="text-[6px] sm:text-[9px] text-emerald-400 font-mono font-bold uppercase mt-1 flex items-center gap-0.5 animate-pulse">
+                    <Award className="w-1.5 sm:w-2.5 h-1.5 sm:h-2.5" /> NEW BEST!
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-col items-center justify-center py-1 sm:py-1.5">
-                <span className="text-[9px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Depth</span>
-                <span className="text-2xl sm:text-4xl font-extrabold text-orange-400 font-mono leading-none tracking-tight">{depth.toFixed(1)}M</span>
+              <div className="flex flex-col items-center justify-center py-0.5 sm:py-1.5">
+                <span className="text-[7px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Total Depth</span>
+                <span className="text-base sm:text-4xl font-extrabold text-orange-400 font-mono leading-none tracking-tight">{depth.toFixed(1)}M</span>
                 {depth >= highDepth && depth > 0 && (
-                  <span className="text-[8px] sm:text-[9px] text-[#fb923c] font-mono font-bold uppercase mt-1 sm:mt-1.5 flex items-center gap-0.5 animate-pulse">
-                    <Sparkles className="w-2 sm:w-2.5 h-2 sm:h-2.5" /> DEEPEST LOG!
+                  <span className="text-[6px] sm:text-[9px] text-[#fb923c] font-mono font-bold uppercase mt-1 flex items-center gap-0.5 animate-pulse">
+                    <Sparkles className="w-1.5 sm:w-2.5 h-1.5 sm:h-2.5" /> DEEPEST LOG!
                   </span>
                 )}
               </div>
             </div>
 
             {/* Action panel */}
-            <div className="flex flex-col gap-2 sm:gap-4 items-center pb-2 shrink-0">
+            <div className="flex flex-col gap-1.5 sm:gap-4 items-center shrink-0">
               <button 
                 id="btn-reengage-magnet"
                 onClick={startGame}
-                className="group px-5 sm:px-7 py-2.5 sm:py-3.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold tracking-wider text-sm sm:text-base uppercase rounded-xl cursor-pointer flex items-center gap-2 shadow-[0_4px_25px_rgba(249,115,22,0.25)] hover:shadow-[0_4px_30px_rgba(249,115,22,0.45)] transition-all hover:scale-[1.03]"
+                className="group px-4 sm:px-7 py-1.5 sm:py-3.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold tracking-wider text-[10px] sm:text-sm uppercase rounded-lg cursor-pointer flex items-center gap-1.5 shadow-[0_4px_20px_rgba(249,115,22,0.2)] hover:shadow-[0_4px_30px_rgba(249,115,22,0.4)] transition-all hover:scale-[1.03]"
               >
-                <RotateCcw className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:rotate-[-45deg] transition-transform font-extrabold" />
+                <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 group-hover:rotate-[-45deg] transition-transform font-extrabold" />
                 RE-ENGAGE MAGNETS
               </button>
               
               <button 
                 onClick={() => setGameMode("TITLE")}
-                className="px-4 py-1.5 hover:bg-slate-900 border border-transparent hover:border-slate-800 text-slate-400 hover:text-slate-200 text-[10px] sm:text-xs font-mono uppercase rounded-lg transition-all cursor-pointer"
+                className="px-3 py-1 hover:bg-slate-900 border border-transparent hover:border-slate-800 text-slate-400 hover:text-slate-200 text-[8px] sm:text-xs font-mono uppercase rounded-lg transition-all cursor-pointer"
               >
                 RETURN TO PRE-ENGAGEMENT TERMINAL
               </button>
