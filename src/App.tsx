@@ -1952,34 +1952,34 @@ export default function App() {
               SUB-SURFACE PLASMA CORES HARVESTING OPERATION
             </p>
 
-            {/* Instruction Layout Grid - Vertical on mobile, compact on tablet/desktop */}
-            <div className="w-full max-w-[720px] grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4.5 mb-4 sm:mb-8 text-left text-[10px] sm:text-xs">
-              <div className="bg-slate-900/60 border border-slate-850 p-2 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col gap-1 sm:gap-2">
-                <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
-                  <div className="w-4 h-4 sm:w-6 sm:h-6 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-[9px] sm:text-xs shrink-0">1</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[10px] sm:text-xs">Sling Probe</h3>
+            {/* Instruction Layout Grid - Keep 3-columns always to optimize vertical space on mobile and landscape */}
+            <div className="w-full max-w-[720px] grid grid-cols-3 gap-1.5 sm:gap-3 md:gap-4.5 mb-3 sm:mb-6 text-left text-[8px] sm:text-[10px] md:text-xs shrink-0">
+              <div className="bg-slate-900/60 border border-slate-850 p-1.5 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
+                <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
+                  <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-[8px] sm:text-xs shrink-0">1</div>
+                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[8px] sm:text-xs">Sling Probe</h3>
                 </div>
-                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[9px] sm:text-[11px] md:text-xs">
+                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[8px] sm:text-[11px] md:text-xs">
                   Touch & drag backward anywhere on the viewport, then release to launch a high-speed magnetic probe deep into the jagged shaft.
                 </p>
               </div>
 
-              <div className="bg-slate-900/60 border border-slate-850 p-2 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col gap-1 sm:gap-2">
+              <div className="bg-slate-900/60 border border-slate-850 p-1.5 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
-                  <div className="w-4 h-4 sm:w-6 sm:h-6 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[9px] sm:text-xs shrink-0">2</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[10px] sm:text-xs">Magnet Latch</h3>
+                  <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[8px] sm:text-xs shrink-0">2</div>
+                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[8px] sm:text-xs">Magnet Latch</h3>
                 </div>
-                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[9px] sm:text-[11px] md:text-xs">
+                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[8px] sm:text-[11px] md:text-xs">
                   Bypass the static walls and rotators. As soon as the probe makes contact with the Core, a permanent tether field is activated.
                 </p>
               </div>
 
-              <div className="bg-slate-900/60 border border-slate-850 p-2 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col gap-1 sm:gap-2">
+              <div className="bg-slate-900/60 border border-slate-850 p-1.5 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5">
-                  <div className="w-4 h-4 sm:w-6 sm:h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-[9px] sm:text-xs shrink-0">3</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[10px] sm:text-xs">The Pull</h3>
+                  <div className="w-3.5 h-3.5 sm:w-6 sm:h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-[8px] sm:text-xs shrink-0">3</div>
+                  <h3 className="font-bold text-slate-200 uppercase tracking-wider text-[8px] sm:text-xs">The Pull</h3>
                 </div>
-                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[9px] sm:text-[11px] md:text-xs">
+                <p className="text-slate-400 leading-normal sm:leading-relaxed text-[8px] sm:text-[11px] md:text-xs">
                   Tap & hold anywhere to pull the heavy Core upward. Avoid crashing into hazardous explosive red barrels or disruptor zones!
                 </p>
               </div>
@@ -1990,10 +1990,10 @@ export default function App() {
               <button 
                 id="btn-engage-operation"
                 onClick={startGame}
-                className="group px-6 sm:px-8 py-2.5 sm:py-4 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold text-sm sm:text-lg uppercase tracking-wider rounded-xl cursor-pointer flex items-center gap-2 shadow-[0_4px_25px_rgba(249,115,22,0.35)] hover:shadow-[0_4px_30px_rgba(249,115,22,0.55)] transition-all hover:scale-[1.03]"
+                className="group px-6 sm:px-8 py-2 sm:py-3.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold text-xs sm:text-lg uppercase tracking-wider rounded-xl cursor-pointer flex items-center gap-2 shadow-[0_4px_25px_rgba(249,115,22,0.35)] hover:shadow-[0_4px_30px_rgba(249,115,22,0.55)] transition-all hover:scale-[1.03]"
               >
-                INITIALIZE ELECTROMAGNETS
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
+                INITIATE EXTRACTION
+                <ArrowRight className="w-3.5 h-3.5 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
               </button>
             </div>
 
