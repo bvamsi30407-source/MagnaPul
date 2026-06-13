@@ -1,0 +1,6 @@
+{
+  "name": "Magna-Pull: Core Retrieval",
+  "description": "A high-performance physics-puzzle game. Sling magnetic pulses, deploy industrial magnets, and pull heavy energy cores through a hazardous procedurally generated cave.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
