@@ -485,6 +485,7 @@ export default function App() {
   });
   const [musicMuted, setMusicMuted] = useState<boolean>(false);
   const [isPortrait, setIsPortrait] = useState<boolean>(false);
+  const [isShortHeight, setIsShortHeight] = useState<boolean>(false);
   
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -542,6 +543,7 @@ export default function App() {
     const handleResize = () => {
       // isPortrait is true if viewport height is strictly greater than width
       setIsPortrait(window.innerHeight > window.innerWidth);
+      setIsShortHeight(window.innerHeight < 550);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -1844,7 +1846,7 @@ export default function App() {
   }, [score, musicMuted, gameStarted]);
 
   return (
-    <div className="w-full min-h-screen bg-[#020617] flex flex-col items-center justify-center p-2 sm:p-4 font-sans select-none overflow-hidden relative">
+    <div className="w-full h-screen h-[100dvh] bg-[#020617] flex flex-col items-center justify-center p-1 sm:p-4 font-sans select-none overflow-hidden relative">
       {/* BACKGROUND INDUSTRIAL GRID EFFECTS */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.15)_0%,rgba(2,6,23,0.85)_100%)] pointer-events-none" />
 
@@ -1870,14 +1872,14 @@ export default function App() {
 
 
       {/* TOP COMPACT TITLE HEADER & VOLUME BUTTON */}
-      <div id="game-controls-header" className="w-full max-w-[1240px] flex justify-between items-center mb-2 z-20 relative">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 border-2 border-orange-500 rounded-lg flex items-center justify-center bg-slate-900 shadow-[0_0_15px_rgba(249,115,22,0.15)] animate-pulse shrink-0">
-            <Radio className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+      <div id="game-controls-header" className={`w-full max-w-[1240px] flex justify-between items-center z-20 relative ${isShortHeight ? 'mb-1 text-[11px]' : 'mb-2'}`}>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="w-6 h-6 sm:w-9 sm:h-9 border border-orange-500/40 rounded-lg flex items-center justify-center bg-slate-900 shadow-[0_0_15px_rgba(249,115,22,0.15)] animate-pulse shrink-0">
+            <Radio className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-orange-500" />
           </div>
           <div>
-            <h1 className="text-sm sm:text-lg md:text-xl font-extrabold tracking-tight text-slate-100 font-sans uppercase leading-none">
-              MAGNA-PULL <span className="text-orange-500 font-extrabold text-[10px] sm:text-xs ml-1 px-1.5 py-0.5 border border-orange-500/20 bg-orange-500/10 rounded">CORE RETRIEVAL</span>
+            <h1 className="text-[10px] sm:text-lg md:text-xl font-extrabold tracking-tight text-slate-100 font-sans uppercase leading-none">
+              MAGNA-PULL <span className={`${isShortHeight ? 'hidden' : 'inline'} text-orange-500 font-extrabold text-[8px] sm:text-xs ml-1 px-1.5 py-0.5 border border-orange-500/20 bg-orange-500/10 rounded`}>CORE RETRIEVAL</span>
             </h1>
           </div>
         </div>
@@ -1886,16 +1888,16 @@ export default function App() {
           <button 
             id="sound-opt-toggle"
             onClick={toggleMute}
-            className="w-8 h-8 sm:w-10 sm:h-10 border border-slate-700 hover:border-orange-500 rounded-lg sm:rounded-xl flex items-center justify-center bg-slate-900/60 hover:bg-slate-900 text-slate-400 hover:text-slate-100 cursor-pointer transition-all duration-200 shrink-0"
+            className="w-6 h-6 sm:w-10 sm:h-10 border border-slate-700 hover:border-orange-500 rounded-lg flex items-center justify-center bg-slate-900/60 hover:bg-slate-900 text-slate-400 hover:text-slate-100 cursor-pointer transition-all duration-200 shrink-0"
             title={musicMuted ? "Unmute sound synthesizers" : "Mute audio mechanics"}
           >
-            {musicMuted ? <VolumeX className="w-4 h-4 sm:w-5 sm:h-5" /> : <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" />}
+            {musicMuted ? <VolumeX className="w-3.5 h-3.5 sm:w-5 sm:h-5" /> : <Volume2 className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-slate-300" />}
           </button>
         </div>
       </div>
 
       {/* RENDER VIEWPORT: LETTERBOX ASPECT-RATIO PRESERVATION STRAW */}
-      <div className="relative aspect-video w-full max-w-[1240px] max-h-[calc(100vh-100px)] md:max-h-[640px] shadow-[0_0_50px_rgba(0,0,0,0.85)] rounded-2xl overflow-hidden border border-slate-800 bg-[#060912] flex items-center justify-center z-10 select-none">
+      <div className={`relative aspect-video w-full max-w-[1240px] shadow-[0_0_50px_rgba(0,0,0,0.85)] rounded-2xl overflow-hidden border border-slate-800 bg-[#060912] flex items-center justify-center z-10 select-none ${isShortHeight ? 'max-h-[calc(100vh-45px)]' : 'max-h-[calc(100vh-100px)] md:max-h-[640px]'}`}>
         
         {/* GAME PLAYING INTERACTION CANVAS */}
         <canvas 
@@ -1949,65 +1951,65 @@ export default function App() {
         {gameMode === "TITLE" && (
           <div className="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center p-2 sm:p-6 z-30 font-sans text-center transition-all max-h-full">
             {/* Visual Header Motif */}
-            <div className="hidden min-[400px]:flex w-6 h-6 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-500 mb-1.5 sm:mb-6 shadow-[0_0_20px_rgba(249,115,22,0.15)] animate-bounce shrink-0">
+            <div className={`${isShortHeight ? 'hidden' : 'hidden min-[400px]:flex'} w-6 h-6 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-500 mb-1.5 sm:mb-6 shadow-[0_0_20px_rgba(249,115,22,0.15)] animate-bounce shrink-0`}>
               <Zap className="w-3.5 h-3.5 sm:w-8 sm:h-8 font-extrabold" />
             </div>
 
-            <h1 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-100 tracking-tight leading-none mb-0.5 sm:mb-2 select-none uppercase font-sans shrink-0">
+            <h1 className={`font-extrabold text-slate-100 tracking-tight leading-none select-none uppercase font-sans shrink-0 ${isShortHeight ? 'text-base mb-0.5' : 'text-xl sm:text-4xl md:text-5xl lg:text-6xl mb-0.5 sm:mb-2'}`}>
               MAGNA-PULL
             </h1>
-            <p className="font-mono text-[8px] sm:text-xs md:text-sm tracking-widest text-orange-400 font-medium mb-2.5 sm:mb-6 shrink-0">
+            <p className={`font-mono tracking-widest text-orange-400 font-medium shrink-0 ${isShortHeight ? 'text-[6px] mb-1.5' : 'text-[8px] sm:text-xs md:text-sm mb-2.5 sm:mb-6'}`}>
               SUB-SURFACE PLASMA CORES HARVESTING OPERATION
             </p>
 
             {/* Instruction Layout Grid */}
-            <div className="w-full max-w-[700px] grid grid-cols-3 gap-1 sm:gap-3 md:gap-4.5 mb-2.5 sm:mb-6 text-left shrink-0">
-              <div className="bg-slate-900/40 border border-slate-850 p-1 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
-                <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
-                  <div className="w-3 h-3 sm:w-6 sm:h-6 rounded bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold text-[7px] sm:text-xs shrink-0">1</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-divider text-[7px] sm:text-xs">Sling Probe</h3>
+            <div className={`w-full grid grid-cols-3 text-left shrink-0 ${isShortHeight ? 'max-w-[480px] gap-1 mb-1.5' : 'max-w-[700px] gap-1.5 sm:gap-3 md:gap-4.5 mb-2.5 sm:mb-6'}`}>
+              <div className={`bg-slate-900/40 border border-slate-850 rounded-lg flex flex-col ${isShortHeight ? 'p-1 gap-0.5' : 'p-1.5 sm:p-4 gap-0.5 sm:gap-2'}`}>
+                <div className="flex items-center gap-1 mb-0.5">
+                  <div className={`rounded bg-orange-500/10 text-orange-400 flex items-center justify-center font-bold shrink-0 ${isShortHeight ? 'w-2.5 h-2.5 text-[5px]' : 'w-3 h-3 sm:w-6 sm:h-6 text-[7px] sm:text-xs'}`}>1</div>
+                  <h3 className={`font-bold text-slate-200 uppercase tracking-divider ${isShortHeight ? 'text-[6px]' : 'text-[7px] sm:text-xs'}`}>Sling Probe</h3>
                 </div>
-                <p className="text-slate-400 leading-tight sm:leading-relaxed text-[7px] sm:text-[11px] md:text-xs">
+                <p className={`text-slate-400 leading-tight ${isShortHeight ? 'text-[5px]' : 'text-[7px] sm:text-[11px] md:text-xs'}`}>
                   Drag back & release to launch magnetic probe deep.
                 </p>
               </div>
 
-              <div className="bg-slate-900/40 border border-slate-850 p-1 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
-                <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
-                  <div className="w-3 h-3 sm:w-6 sm:h-6 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-[7px] sm:text-xs shrink-0">2</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-divider text-[7px] sm:text-xs">Latch</h3>
+              <div className={`bg-slate-900/40 border border-slate-850 rounded-lg flex flex-col ${isShortHeight ? 'p-1 gap-0.5' : 'p-1.5 sm:p-4 gap-0.5 sm:gap-2'}`}>
+                <div className="flex items-center gap-1 mb-0.5">
+                  <div className={`rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold shrink-0 ${isShortHeight ? 'w-2.5 h-2.5 text-[5px]' : 'w-3 h-3 sm:w-6 sm:h-6 text-[7px] sm:text-xs'}`}>2</div>
+                  <h3 className={`font-bold text-slate-200 uppercase tracking-divider ${isShortHeight ? 'text-[6px]' : 'text-[7px] sm:text-xs'}`}>Latch</h3>
                 </div>
-                <p className="text-slate-400 leading-tight sm:leading-relaxed text-[7px] sm:text-[11px] md:text-xs">
+                <p className={`text-slate-400 leading-tight ${isShortHeight ? 'text-[5px]' : 'text-[7px] sm:text-[11px] md:text-xs'}`}>
                   Automatic connection on core contact.
                 </p>
               </div>
 
-              <div className="bg-slate-900/40 border border-slate-850 p-1 sm:p-4 rounded-lg sm:rounded-2xl flex flex-col gap-0.5 sm:gap-2">
-                <div className="flex items-center gap-1 sm:gap-2 mb-0.5">
-                  <div className="w-3 h-3 sm:w-6 sm:h-6 rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-[7px] sm:text-xs shrink-0">3</div>
-                  <h3 className="font-bold text-slate-200 uppercase tracking-divider text-[7px] sm:text-xs">The Pull</h3>
+              <div className={`bg-slate-900/40 border border-slate-850 rounded-lg flex flex-col ${isShortHeight ? 'p-1 gap-0.5' : 'p-1.5 sm:p-4 gap-0.5 sm:gap-2'}`}>
+                <div className="flex items-center gap-1 mb-0.5">
+                  <div className={`rounded bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold shrink-0 ${isShortHeight ? 'w-2.5 h-2.5 text-[5px]' : 'w-3 h-3 sm:w-6 sm:h-6 text-[7px] sm:text-xs'}`}>3</div>
+                  <h3 className={`font-bold text-slate-200 uppercase tracking-divider ${isShortHeight ? 'text-[6px]' : 'text-[7px] sm:text-xs'}`}>The Pull</h3>
                 </div>
-                <p className="text-slate-400 leading-tight sm:leading-relaxed text-[7px] sm:text-[11px] md:text-xs">
+                <p className={`text-slate-400 leading-tight ${isShortHeight ? 'text-[5px]' : 'text-[7px] sm:text-[11px] md:text-xs'}`}>
                   Hold press anywhere to pull core upward.
                 </p>
               </div>
             </div>
 
             {/* Launch controls CTA */}
-            <div className="flex flex-col items-center mb-1.5 sm:mb-4 shrink-0">
+            <div className={`flex flex-col items-center shrink-0 ${isShortHeight ? 'mb-1' : 'mb-1.5 sm:mb-4'}`}>
               <button 
                 id="btn-engage-operation"
                 onClick={startGame}
-                className="group px-4 sm:px-8 py-1.5 sm:py-3.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold text-[10px] sm:text-sm uppercase tracking-wider rounded-lg sm:rounded-xl cursor-pointer flex items-center gap-1.5 shadow-[0_4px_20px_rgba(249,115,22,0.3)] hover:shadow-[0_4px_35px_rgba(249,115,22,0.5)] transition-all hover:scale-[1.03]"
+                className={`group bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold uppercase tracking-wider rounded-lg cursor-pointer flex items-center shadow-[0_4px_20px_rgba(249,115,22,0.3)] hover:shadow-[0_4px_35px_rgba(249,115,22,0.5)] transition-all hover:scale-[1.03] ${isShortHeight ? 'px-3 py-1 text-[8px] gap-1' : 'px-4 sm:px-8 py-1.5 sm:py-3.5 text-[10px] sm:text-sm gap-1.5 sm:rounded-xl'}`}
               >
                 INITIATE EXTRACTION
-                <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
+                <ArrowRight className={`group-hover:translate-x-1.5 transition-transform ${isShortHeight ? 'w-2.5 h-2.5' : 'w-3 h-3 sm:w-4 sm:h-4'}`} />
               </button>
             </div>
 
             {/* Secondary High Score reading */}
             {highScore > 0 && (
-              <div className="mt-1.5 sm:mt-4 flex gap-4 text-[7px] sm:text-xs text-slate-500 font-mono pb-1 shrink-0">
+              <div className={`flex gap-4 text-slate-500 font-mono pb-1 shrink-0 ${isShortHeight ? 'mt-1 text-[6px]' : 'mt-1.5 sm:mt-4 text-[7px] sm:text-xs'}`}>
                 <span>RECORD CORES CHRONICLED: <strong className="text-slate-300">{highScore}</strong></span>
                 <span>DEEPEST RECORD: <strong className="text-slate-300">{highDepth.toFixed(1)}M</strong></span>
               </div>
@@ -2020,34 +2022,34 @@ export default function App() {
            ========================================== */}
         {gameMode === "GAMEOVER" && (
           <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-3 sm:p-6 z-30 text-center animate-fade-in font-sans max-h-full">
-            <div className="hidden min-[400px]:flex w-6 h-6 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500 mb-1.5 sm:mb-5 shadow-[0_0_20px_rgba(239,68,68,0.15)] shrink-0">
+            <div className={`${isShortHeight ? 'hidden' : 'hidden min-[400px]:flex'} w-6 h-6 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500 mb-1.5 sm:mb-5 shadow-[0_0_20px_rgba(239,68,68,0.15)] shrink-0`}>
               <ShieldAlert className="w-3.5 h-3.5 sm:w-8 sm:h-8" />
             </div>
 
-            <h2 className="text-base sm:text-4xl md:text-5xl font-extrabold text-slate-100 tracking-tight leading-none mb-0.5 select-none uppercase shrink-0">
+            <h2 className={`font-extrabold text-slate-100 tracking-tight leading-none mb-0.5 select-none uppercase shrink-0 ${isShortHeight ? 'text-xs sm:text-sm' : 'text-base sm:text-4xl md:text-5xl'}`}>
               CONNECTION FLUID LOST
             </h2>
-            <p className="font-mono text-[7px] sm:text-xs text-red-400 tracking-widest uppercase mb-2 sm:mb-8 shrink-0">
+            <p className={`font-mono text-red-400 tracking-widest uppercase shrink-0 ${isShortHeight ? 'text-[6px] mb-1.5' : 'text-[7px] sm:text-xs mb-2.5 sm:mb-8'}`}>
               Operations Cancelled — Core Integrity Compromised
             </p>
 
             {/* Scoreboard display */}
-            <div className="bg-slate-900 border border-slate-800 p-2 sm:p-6 rounded-lg sm:rounded-2xl w-full max-w-[380px] mb-2.5 sm:mb-8 font-sans grid grid-cols-2 gap-2 sm:gap-4 shrink-0">
+            <div className={`bg-slate-900 border border-slate-800 rounded-lg sm:rounded-2xl w-full font-sans grid grid-cols-2 shrink-0 ${isShortHeight ? 'max-w-[280px] p-1 mb-1.5 gap-1.5' : 'max-w-[380px] p-2 sm:p-6 mb-2.5 sm:mb-8 gap-2 sm:gap-4'}`}>
               <div className="flex flex-col items-center justify-center border-r border-slate-800 py-0.5 sm:py-1.5">
-                <span className="text-[7px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Cores Harvested</span>
-                <span className="text-base sm:text-4xl font-extrabold text-[#4ade80] font-mono leading-none tracking-tight">{score}</span>
+                <span className={`font-bold text-slate-500 uppercase tracking-wider ${isShortHeight ? 'text-[6px] mb-0.2' : 'text-[7px] sm:text-[10px] mb-0.5'}`}>Cores Harvested</span>
+                <span className={`font-extrabold text-[#4ade80] font-mono leading-none tracking-tight ${isShortHeight ? 'text-xs' : 'text-base sm:text-4xl'}`}>{score}</span>
                 {score >= highScore && score > 0 && (
-                  <span className="text-[6px] sm:text-[9px] text-emerald-400 font-mono font-bold uppercase mt-1 flex items-center gap-0.5 animate-pulse">
+                  <span className={`text-[#4ade80] font-mono font-bold uppercase mt-1 flex items-center gap-0.5 animate-pulse ${isShortHeight ? 'text-[5px]' : 'text-[6px] sm:text-[9px]'}`}>
                     <Award className="w-1.5 sm:w-2.5 h-1.5 sm:h-2.5" /> NEW BEST!
                   </span>
                 )}
               </div>
 
               <div className="flex flex-col items-center justify-center py-0.5 sm:py-1.5">
-                <span className="text-[7px] sm:text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">Total Depth</span>
-                <span className="text-base sm:text-4xl font-extrabold text-orange-400 font-mono leading-none tracking-tight">{depth.toFixed(1)}M</span>
+                <span className={`font-bold text-slate-500 uppercase tracking-wider ${isShortHeight ? 'text-[6px] mb-0.2' : 'text-[7px] sm:text-[10px] mb-0.5'}`}>Total Depth</span>
+                <span className={`font-extrabold text-orange-400 font-mono leading-none tracking-tight ${isShortHeight ? 'text-xs' : 'text-base sm:text-4xl'}`}>{depth.toFixed(1)}M</span>
                 {depth >= highDepth && depth > 0 && (
-                  <span className="text-[6px] sm:text-[9px] text-[#fb923c] font-mono font-bold uppercase mt-1 flex items-center gap-0.5 animate-pulse">
+                  <span className={`text-[#fb923c] font-mono font-bold uppercase mt-1 flex items-center gap-0.5 animate-pulse ${isShortHeight ? 'text-[5px]' : 'text-[6px] sm:text-[9px]'}`}>
                     <Sparkles className="w-1.5 sm:w-2.5 h-1.5 sm:h-2.5" /> DEEPEST LOG!
                   </span>
                 )}
@@ -2055,19 +2057,19 @@ export default function App() {
             </div>
 
             {/* Action panel */}
-            <div className="flex flex-col gap-1.5 sm:gap-4 items-center shrink-0">
+            <div className="flex flex-col gap-1 items-center shrink-0">
               <button 
                 id="btn-reengage-magnet"
                 onClick={startGame}
-                className="group px-4 sm:px-7 py-1.5 sm:py-3.5 bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold tracking-wider text-[10px] sm:text-sm uppercase rounded-lg cursor-pointer flex items-center gap-1.5 shadow-[0_4px_20px_rgba(249,115,22,0.2)] hover:shadow-[0_4px_30px_rgba(249,115,22,0.4)] transition-all hover:scale-[1.03]"
+                className={`group bg-orange-500 hover:bg-orange-400 text-slate-950 font-extrabold tracking-wider uppercase rounded-lg cursor-pointer flex items-center shadow-[0_4px_20px_rgba(249,115,22,0.2)] hover:shadow-[0_4px_30px_rgba(249,115,22,0.4)] transition-all hover:scale-[1.03] ${isShortHeight ? 'px-3 py-1 text-[8px] gap-1' : 'px-4 sm:px-7 py-1.5 sm:py-3.5 text-[10px] sm:text-sm gap-1.5'}`}
               >
-                <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 group-hover:rotate-[-45deg] transition-transform font-extrabold" />
+                <RotateCcw className={`group-hover:rotate-[-45deg] transition-transform font-extrabold ${isShortHeight ? 'w-2.5 h-2.5' : 'w-3 h-3 sm:w-4 sm:h-4'}`} />
                 RE-ENGAGE MAGNETS
               </button>
               
               <button 
                 onClick={() => setGameMode("TITLE")}
-                className="px-3 py-1 hover:bg-slate-900 border border-transparent hover:border-slate-800 text-slate-400 hover:text-slate-200 text-[8px] sm:text-xs font-mono uppercase rounded-lg transition-all cursor-pointer"
+                className={`text-slate-400 hover:text-slate-200 font-mono uppercase rounded-lg transition-all cursor-pointer ${isShortHeight ? 'px-2 py-0.5 text-[6px]' : 'px-3 py-1 hover:bg-slate-900 border border-transparent hover:border-slate-800 text-[8px] sm:text-xs'}`}
               >
                 RETURN TO PRE-ENGAGEMENT TERMINAL
               </button>
@@ -2085,14 +2087,16 @@ export default function App() {
       </div>
 
       {/* FOOTER USER GUIDELINE BRANDING */}
-      <div id="game-controls-helpbar" className="w-full max-w-[1240px] flex flex-col md:flex-row md:justify-between items-center text-slate-500 text-[9px] sm:text-[11px] font-mono mt-2 sm:mt-3 select-none pointer-events-none opacity-45">
-        <span>MAGNA-PULL INDUSTRIAL RETRIEVAL PLATFORM v4.0.0</span>
-        <div className="flex gap-4 mt-1 md:mt-0">
-          <span>COILS STATUS: OK</span>
-          <span>MAGNET LEVEL: DEEPWELL CORE EXTRACTOR</span>
-          <span>SYSTEM OPERATIONAL</span>
+      {!isShortHeight && (
+        <div id="game-controls-helpbar" className="w-full max-w-[1240px] flex flex-col md:flex-row md:justify-between items-center text-slate-500 text-[9px] sm:text-[11px] font-mono mt-2 sm:mt-3 select-none pointer-events-none opacity-45">
+          <span>MAGNA-PULL INDUSTRIAL RETRIEVAL PLATFORM v4.0.0</span>
+          <div className="flex gap-4 mt-1 md:mt-0">
+            <span>COILS STATUS: OK</span>
+            <span>MAGNET LEVEL: DEEPWELL CORE EXTRACTOR</span>
+            <span>SYSTEM OPERATIONAL</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
