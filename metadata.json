@@ -1,6 +1,6 @@
 {
-  "name": "Magna-Pull: Core Retrieval",
-  "description": "Abyssal Echoes: An atmospheric deep-sea stealth game. Pilot a research submarine through a pitch-black trench, avoiding blind apex predators that hunt by sound while retrieving bioluminescent relics.",
+  "name": "Abyssal Echoes",
+  "description": "An atmospheric deep sea submarine stealth game where you pilot a research vessel and retrieve bioluminescent relics.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
