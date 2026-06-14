@@ -31,7 +31,12 @@ class AudioEngine {
   constructor() {}
 
   init() {
-    if (this.ctx) return;
+    if (this.ctx) {
+      if (this.ctx.state === "suspended") {
+        this.ctx.resume().catch((err) => console.warn("Failed to resume context: ", err));
+      }
+      return;
+    }
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioContextClass) return;
 
@@ -286,6 +291,143 @@ interface Particle {
 }
 
 // ==========================================
+// 2B. MILESTONE ENVIRONMENT THEMES DEFINITIONS
+// ==========================================
+interface EnvironmentTheme {
+  minDepth: number; // in meters
+  name: string;
+  fillColor: string;
+  borderColor: string;
+  shadowColor: string;
+  gridColor: string;
+  gridlinesColor: string;
+  hazardColor: string;
+  hazardPivotColor: string;
+  sparkColor: string;
+  fogColor: string;
+}
+
+const MILESTONE_THEMES: EnvironmentTheme[] = [
+  {
+    minDepth: 0,
+    name: "UPPER CRUST MINE",
+    fillColor: "#121622",       // Slate gray
+    borderColor: "#ea580c",     // Orange
+    shadowColor: "rgba(234, 88, 12, 0.4)",
+    gridColor: "#070a13",       // Dark navy
+    gridlinesColor: "#121a2c",  // Steel blue grid
+    hazardColor: "#ea580c",     // Danger orange
+    hazardPivotColor: "#334155",
+    sparkColor: "#ea580c",
+    fogColor: "rgba(234, 88, 12, 0.03)",
+  },
+  {
+    minDepth: 250,
+    name: "BIO-LUMINESCENT CAVERN",
+    fillColor: "#0b1f25",       // Dark teal
+    borderColor: "#06b6d4",     // Cyan
+    shadowColor: "rgba(6, 182, 212, 0.55)",
+    gridColor: "#030d12",       // Deep teal background
+    gridlinesColor: "#0c2830",
+    hazardColor: "#06b6d4",
+    hazardPivotColor: "#115e59",
+    sparkColor: "#34d399",      // Emerald-green sparks
+    fogColor: "rgba(6, 182, 212, 0.06)",
+  },
+  {
+    minDepth: 500,
+    name: "AMETHYST ABYSS",
+    fillColor: "#140a1d",       // Deep dark violet
+    borderColor: "#a855f7",     // Amethyst purple
+    shadowColor: "rgba(168, 85, 247, 0.6)",
+    gridColor: "#09030e",       // Dark violet background
+    gridlinesColor: "#221132",
+    hazardColor: "#d946ef",     // Magenta hazard
+    hazardPivotColor: "#4c1d95",
+    sparkColor: "#e879f9",
+    fogColor: "rgba(168, 85, 247, 0.06)",
+  },
+  {
+    minDepth: 750,
+    name: "SULFUR DETONATION CHAMBER",
+    fillColor: "#1f1a0e",       // Dark sulfuric brown-gold
+    borderColor: "#eab308",     // Sulfur Yellow
+    shadowColor: "rgba(234, 179, 8, 0.65)",
+    gridColor: "#0e0c06",
+    gridlinesColor: "#2e250e",
+    hazardColor: "#f97316",     // Orange hazard
+    hazardPivotColor: "#713f12",
+    sparkColor: "#facc15",
+    fogColor: "rgba(234, 179, 8, 0.06)",
+  },
+  {
+    minDepth: 1000,
+    name: "MOLTEN CRITICAL LAVA",
+    fillColor: "#240808",       // Deep lava crust charcoal red
+    borderColor: "#ef4444",     // Hot molten crimson
+    shadowColor: "rgba(239, 68, 68, 0.75)",
+    gridColor: "#0f0303",
+    gridlinesColor: "#370c0c",
+    hazardColor: "#f97316",     // Bright orange hazard
+    hazardPivotColor: "#7f1d1d",
+    sparkColor: "#f97316",
+    fogColor: "rgba(239, 68, 68, 0.08)",
+  },
+  {
+    minDepth: 1500,
+    name: "THE QUANTUM VOID",
+    fillColor: "#041512",       // Quantum deep forest black
+    borderColor: "#10b981",     // Void Matrix emerald green
+    shadowColor: "rgba(16, 185, 129, 0.8)",
+    gridColor: "#010807",
+    gridlinesColor: "#0d2c25",
+    hazardColor: "#06b6d4",     // Quantum electric cyan
+    hazardPivotColor: "#064e3b",
+    sparkColor: "#10b981",
+    fogColor: "rgba(16, 185, 129, 0.08)",
+  }
+];
+
+const getThemeForDepth = (depthVal: number): EnvironmentTheme => {
+  let active = MILESTONE_THEMES[0];
+  for (let i = MILESTONE_THEMES.length - 1; i >= 0; i--) {
+    if (depthVal >= MILESTONE_THEMES[i].minDepth) {
+      active = MILESTONE_THEMES[i];
+      break;
+    }
+  }
+  return active;
+};
+
+function lerpColor(color1: string, color2: string, percentage: number): string {
+  const parseHex = (hex: string) => {
+    let c = hex.substring(1);
+    if (c.length === 3) {
+      c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+    }
+    const num = parseInt(c, 16);
+    return {
+      r: (num >> 16) & 255,
+      g: (num >> 8) & 255,
+      b: num & 255
+    };
+  };
+
+  try {
+    const c1 = parseHex(color1);
+    const c2 = parseHex(color2);
+
+    const r = Math.round(c1.r + (c2.r - c1.r) * percentage);
+    const g = Math.round(c1.g + (c2.g - c1.g) * percentage);
+    const b = Math.round(c1.b + (c2.b - c1.b) * percentage);
+
+    return `rgb(${r}, ${g}, ${b})`;
+  } catch (e) {
+    return color1; // Fallback
+  }
+}
+
+// ==========================================
 // 3. CAVERN & HAZARDS PROCEDURAL MAP BUILDER
 // ==========================================
 function generateCavern(index: number): Cavern {
@@ -484,13 +626,20 @@ export default function App() {
     return Number(localStorage.getItem("magnapull_highdepth") || "0");
   });
   const [musicMuted, setMusicMuted] = useState<boolean>(false);
-  const [isPortrait, setIsPortrait] = useState<boolean>(false);
   const [isShortHeight, setIsShortHeight] = useState<boolean>(false);
+  
+  const [milestoneMessage, setMilestoneMessage] = useState<string>("");
+  const [milestoneSub, setMilestoneSub] = useState<string>("");
+  const [showMilestoneAlert, setShowMilestoneAlert] = useState<boolean>(false);
   
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // References to keep 60FPS math synchronized and unblocked by React renders
   const gameModeRef = useRef<string>("TITLE");
+  const setGameModeWithRef = (mode: "TITLE" | "PLAYING" | "SUCCESS_TRANSITION" | "SCROLLING" | "GAMEOVER") => {
+    gameModeRef.current = mode;
+    setGameMode(mode);
+  };
   const currentLevelIndexRef = useRef<number>(0);
   
   // Custom Slingshot physics state
@@ -499,10 +648,15 @@ export default function App() {
   const dragCurrentRef = useRef<Point | null>(null);
 
   // Active Phase: 'SLING' -> 'LAUNCHED' -> 'PULL'
+  const [phase, setPhase] = useState<"SLING" | "LAUNCHED" | "PULL">("SLING");
   const phaseRef = useRef<"SLING" | "LAUNCHED" | "PULL">("SLING");
+  const setPhaseWithRef = (newPhase: "SLING" | "LAUNCHED" | "PULL") => {
+    phaseRef.current = newPhase;
+    setPhase(newPhase);
+  };
 
   // Physics Objects
-  const pulseRef = useRef<{ x: number; y: number; vx: number; vy: number; radius: number } | null>(null);
+  const pulseRef = useRef<{ x: number; y: number; vx: number; vy: number; radius: number; hasBounced?: boolean } | null>(null);
   const coreRef = useRef<{ x: number; y: number; vx: number; vy: number; radius: number } | null>(null);
 
   // Level maps
@@ -516,10 +670,13 @@ export default function App() {
   // Visual offsets
   const scrollProgressRef = useRef<number>(0.0);
   const cameraShakeRef = useRef<number>(0);
+  const cameraYRef = useRef<number>(0);
   const coreCapturedTimerRef = useRef<number>(0);
 
   // Holding pulling triggers
   const isHoldingPullRef = useRef<boolean>(false);
+  const isTetheredRef = useRef<boolean>(false);
+  const tetherGraceRef = useRef<number>(0);
 
   // Particles
   const particlesRef = useRef<Particle[]>([]);
@@ -538,11 +695,19 @@ export default function App() {
     if (d) setHighDepth(Number(d));
   }, []);
 
+  // Timeout to transition/dismiss milestone overlay notification
+  useEffect(() => {
+    if (showMilestoneAlert) {
+      const timer = setTimeout(() => {
+        setShowMilestoneAlert(false);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [showMilestoneAlert]);
+
   // Monitor screen orientation changes for portrait warning
   useEffect(() => {
     const handleResize = () => {
-      // isPortrait is true if viewport height is strictly greater than width
-      setIsPortrait(window.innerHeight > window.innerWidth);
       setIsShortHeight(window.innerHeight < 550);
     };
     handleResize();
@@ -572,8 +737,10 @@ export default function App() {
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const scaleX = 1280 / rect.width;
-    const scaleY = 720 / rect.height;
+    const width = rect.width || 1280;
+    const height = rect.height || 720;
+    const scaleX = 1280 / width;
+    const scaleY = 720 / height;
     const px = (e.clientX - rect.left) * scaleX;
     const py = (e.clientY - rect.top) * scaleY;
 
@@ -584,7 +751,8 @@ export default function App() {
       dragStartRef.current = { x: px, y: py };
       dragCurrentRef.current = { x: px, y: py };
       canvas.setPointerCapture(e.pointerId);
-    } else if (phaseRef.current === "PULL") {
+    } else {
+      // Allow holding the trigger force during LAUNCHED (will instantly trigger pull on connect) or PULL states
       isHoldingPullRef.current = true;
     }
   };
@@ -596,8 +764,10 @@ export default function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
-    const scaleX = 1280 / rect.width;
-    const scaleY = 720 / rect.height;
+    const width = rect.width || 1280;
+    const height = rect.height || 720;
+    const scaleX = 1280 / width;
+    const scaleY = 720 / height;
     const px = (e.clientX - rect.left) * scaleX;
     const py = (e.clientY - rect.top) * scaleY;
 
@@ -637,7 +807,7 @@ export default function App() {
       isDraggingRef.current = false;
       dragStartRef.current = null;
       dragCurrentRef.current = null;
-      phaseRef.current = "LAUNCHED";
+      setPhaseWithRef("LAUNCHED");
 
       audioEngine.playLaunch();
       canvasRef.current?.releasePointerCapture(e.pointerId);
@@ -655,6 +825,7 @@ export default function App() {
     currentLevelIndexRef.current = 0;
     setScore(0);
     setDepth(0);
+    setShowMilestoneAlert(false);
 
     const initCavern = generateCavern(0);
     currentCaveRef.current = initCavern;
@@ -667,18 +838,18 @@ export default function App() {
     // Core details
     coreRef.current = {
       x: startX,
-      y: 635,
+      y: 500,
       vx: 0,
       vy: 0,
       radius: 22
     };
 
     pulseRef.current = null;
-    phaseRef.current = "SLING";
+    setPhaseWithRef("SLING");
     scrollbarAndResetState();
 
     setGameStarted(true);
-    setGameMode("PLAYING");
+    setGameModeWithRef("PLAYING");
   };
 
   const scrollbarAndResetState = () => {
@@ -688,17 +859,24 @@ export default function App() {
     isHoldingPullRef.current = false;
     particlesRef.current = [];
     audioEngine.setHum(0.0);
+    cameraYRef.current = 0;
+    isTetheredRef.current = false;
+    tetherGraceRef.current = 0;
+    cameraShakeRef.current = 0;
+    scrollProgressRef.current = 0.0;
+    nextCaveRef.current = null;
+    nextHazardsRef.current = null;
   };
 
   const triggerDeath = (abyss: boolean) => {
-    setGameMode("GAMEOVER");
+    setGameModeWithRef("GAMEOVER");
     audioEngine.setHum(0);
     audioEngine.playExplosion();
     cameraShakeRef.current = 45;
 
     // Save records
     const finalScore = score;
-    const finalDepth = (score * 12.5); // 12.5 meters depth step representation
+    const finalDepth = (score * 125); // 125 meters depth step representation
     
     if (finalScore > highScore) {
       localStorage.setItem("magnapull_highscore", String(finalScore));
@@ -852,8 +1030,11 @@ export default function App() {
   // Animation frame loop handling physics and graphics updates
   useEffect(() => {
     let animationFrameId: number;
+    let lastTime = performance.now();
+    const frameDelay = 1000 / 60; // Lock to exactly 60 FPS updates
 
-    const tick = () => {
+    const tick = (timestamp?: number) => {
+      const now = timestamp || performance.now();
       const canvas = canvasRef.current;
       if (!canvas) {
         animationFrameId = requestAnimationFrame(tick);
@@ -865,6 +1046,15 @@ export default function App() {
         return;
       }
 
+      // Safeguard and lock execution rate to 60 FPS across all monitor rates (60Hz, 120Hz, 144Hz, etc.)
+      const elapsed = now - lastTime;
+      if (elapsed < frameDelay) {
+        animationFrameId = requestAnimationFrame(tick);
+        return;
+      }
+      // Paced forward tracking
+      lastTime = now - (elapsed % frameDelay);
+
       // Ensure stable canvas sizes
       if (canvas.width !== 1280 || canvas.height !== 720) {
         canvas.width = 1280;
@@ -875,6 +1065,11 @@ export default function App() {
       if (cameraShakeRef.current > 0) {
         cameraShakeRef.current *= 0.92;
         if (cameraShakeRef.current < 0.2) cameraShakeRef.current = 0;
+      }
+
+      // Decrement tether collision grace countdown
+      if (tetherGraceRef.current > 0) {
+        tetherGraceRef.current--;
       }
 
       // ==========================================
@@ -893,47 +1088,70 @@ export default function App() {
         // 2. Physics Model: Slingshot probe launched
         if (phaseRef.current === "LAUNCHED" && pulseRef.current) {
           const p = pulseRef.current;
-          // Apply light downward gravity on energy probe
-          p.vy += 0.09;
+          // Apply light downward gravity on energy probe (reduced by 40% from 0.09)
+          p.vy += 0.054;
 
           p.x += p.vx;
           p.y += p.vy;
 
-          // Wall interactions
+          // Wall interactions -> Trigger Game Over on wall contact as requested
+          let probeHitWall = false;
           for (let s = 0; s < cave.leftWall.length - 1; s++) {
-            const res = collideCircleWithSegment(p.x, p.y, p.vx, p.vy, p.radius, cave.leftWall[s], cave.leftWall[s+1], 0.6, false);
-            if (res) {
-              p.x = res.x; p.y = res.y; p.vx = res.vx; p.vy = res.vy;
+            if (collideCircleWithSegment(p.x, p.y, p.vx, p.vy, p.radius, cave.leftWall[s], cave.leftWall[s+1], 0.6, false)) {
+              probeHitWall = true;
+              break;
             }
           }
-          for (let s = 0; s < cave.rightWall.length - 1; s++) {
-            const res = collideCircleWithSegment(p.x, p.y, p.vx, p.vy, p.radius, cave.rightWall[s], cave.rightWall[s+1], 0.6, false);
-            if (res) {
-              p.x = res.x; p.y = res.y; p.vx = res.vx; p.vy = res.vy;
+          if (!probeHitWall) {
+            for (let s = 0; s < cave.rightWall.length - 1; s++) {
+              if (collideCircleWithSegment(p.x, p.y, p.vx, p.vy, p.radius, cave.rightWall[s], cave.rightWall[s+1], 0.6, false)) {
+                probeHitWall = true;
+                break;
+              }
             }
           }
 
-          // Rotating metal bars interactions
+          if (probeHitWall) {
+            triggerDeath(false);
+            return;
+          }
+
+          // Rotating metal bars (moving obstacles) -> Trigger Game Over on moving obstacle contact
+          let probeHitRotator = false;
           hazards.rotators.forEach((rot) => {
             const halfL = rot.len / 2;
             const cos = Math.cos(rot.angle);
             const sin = Math.sin(rot.angle);
 
-            const p1 = {
-              x: rot.cx - cos * halfL,
-              y: rot.cy - sin * halfL
-            };
-            const p2 = {
-              x: rot.cx + cos * halfL,
-              y: rot.cy + sin * halfL
-            };
+            const p1 = { x: rot.cx - cos * halfL, y: rot.cy - sin * halfL };
+            const p2 = { x: rot.cx + cos * halfL, y: rot.cy + sin * halfL };
 
-            // Estimate surface sliding speed at contact point
-            const res = collideCircleWithSegment(p.x, p.y, p.vx, p.vy, p.radius, p1, p2, 0.7, false);
-            if (res) {
-              p.x = res.x; p.y = res.y; p.vx = res.vx; p.vy = res.vy;
+            if (collideCircleWithSegment(p.x, p.y, p.vx, p.vy, p.radius, p1, p2, 0.7, false)) {
+              probeHitRotator = true;
             }
           });
+
+          if (probeHitRotator) {
+            triggerDeath(false);
+            return;
+          }
+
+          // Check if pulse hits explosive red barrels -> Trigger Game Over
+          let probeHitBarrel = false;
+          hazards.barrels.forEach((bar) => {
+            const dx = p.x - bar.cx;
+            const dy = p.y - bar.cy;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < p.radius + bar.radius) {
+              probeHitBarrel = true;
+            }
+          });
+
+          if (probeHitBarrel) {
+            triggerDeath(false);
+            return;
+          }
 
           // Check if pulse triggers and latches onto the heavy core
           if (coreRef.current) {
@@ -942,9 +1160,22 @@ export default function App() {
             const dy = p.y - c.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
             
-            if (dist < p.radius + c.radius) {
+            // Doubled the collision detection radius (hitbox size) of the green plasma core as requested
+            if (dist < p.radius + (c.radius * 2.0)) {
               // Pulse latch success triggers the electro-magnetic connection phase!
-              phaseRef.current = "PULL";
+              setPhaseWithRef("PULL");
+              isTetheredRef.current = true;
+              
+              // 1. Maintain dynamic physics - inherit probe's velocity with upward kinetic kick
+              c.vx = p.vx * 0.8;
+              c.vy = p.vy * 0.8 - 4.5;
+
+              // 2. Push core slightly upward away from the platform cradle ledge to prevent stuck overlaps
+              c.y -= 25;
+
+              // 3. Initiate 45-frame bottom platform collision grace period
+              tetherGraceRef.current = 45;
+
               pulseRef.current = null;
               audioEngine.playLatch();
 
@@ -965,12 +1196,42 @@ export default function App() {
                   type: "spark"
                 });
               }
+            } else if (p.y > c.y + 40) {
+              // Probe has missed and gone completely past the core
+              if (!p.hasBounced) {
+                // First miss: automatically reverse direction (bounce upward)
+                p.vy = -Math.abs(p.vy) * 0.85 - 2; // reverse upward
+                p.vx += (Math.random() - 0.5) * 4; // slight horizontal variance
+                p.hasBounced = true;
+                
+                // Spawn recovery warning sparks
+                for (let i = 0; i < 15; i++) {
+                  const angle = Math.random() * Math.PI * 2;
+                  const speed = 1.0 + Math.random() * 3.0;
+                  particlesRef.current.push({
+                    id: particleIdCounterRef.current++,
+                    x: p.x,
+                    y: p.y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: 2 + Math.random() * 2,
+                    color: "#f97316",
+                    alpha: 0.9,
+                    decay: 0.04,
+                    type: "spark"
+                  });
+                }
+              } else {
+                // Already bounced once and still missed? Respawn safely at the top!
+                setPhaseWithRef("SLING");
+                pulseRef.current = null;
+              }
             }
           }
 
-          // Lost in abyss checks
-          if (p.y > 750 || p.x < -100 || p.x > 1380) {
-            phaseRef.current = "SLING";
+          // Lost in abyss checks (safety backup)
+          if (p && (p.y < -50 || p.y > 750 || p.x < -100 || p.x > 1380)) {
+            setPhaseWithRef("SLING");
             pulseRef.current = null;
           }
         }
@@ -980,12 +1241,12 @@ export default function App() {
           const c = coreRef.current;
 
           if (phaseRef.current === "PULL") {
-            // Apply standard environmental gravity
-            c.vy += 0.17; // Heavy core weight factor
+            // Apply standard environmental gravity (reduced by 40% from 0.17)
+            c.vy += 0.102; // Heavy core weight factor
 
-            // Apply constant fluid air damping resistance to control velocity builds
-            c.vx *= 0.992;
-            c.vy *= 0.992;
+            // Apply constant fluid air damping resistance to control velocity builds (dampened to 0.96 for cleaner handling)
+            c.vx *= 0.96;
+            c.vy *= 0.96;
 
             // Apply user electro-magnetic pull force targeting magnet coordinates (640, 65)
             if (isHoldingPullRef.current) {
@@ -999,8 +1260,8 @@ export default function App() {
                 const ux = dx / dist;
                 const uy = dy / dist;
 
-                // Solid attraction force
-                const pullPower = 0.38;
+                // Solid attraction force (increased by 50% from 0.38)
+                const pullPower = 0.57;
                 c.vx += ux * pullPower;
                 c.vy += uy * pullPower;
               }
@@ -1065,78 +1326,79 @@ export default function App() {
             c.x += c.vx;
             c.y += c.vy;
 
-            // Resolve Jagged Rock Cave Walls collisions
+            // Resolve Jagged Rock Cave Walls collisions -> Trigger Game Over on wall hit
+            let coreHitWall = false;
+            const wallCollisionGrace = (tetherGraceRef.current > 0);
             for (let s = 0; s < cave.leftWall.length - 1; s++) {
-              const res = collideCircleWithSegment(c.x, c.y, c.vx, c.vy, c.radius, cave.leftWall[s], cave.leftWall[s+1], 0.35, true);
-              if (res) {
-                c.x = res.x; c.y = res.y; c.vx = res.vx; c.vy = res.vy;
-                cameraShakeRef.current = Math.max(cameraShakeRef.current, Math.min(10, Math.abs(res.vx * 1.2)));
+              // Ignore collisions with bottom platform segments when grace is active to avoid overlapping stick-loops
+              if (wallCollisionGrace && s >= 10) continue;
+              if (collideCircleWithSegment(c.x, c.y, c.vx, c.vy, c.radius, cave.leftWall[s], cave.leftWall[s+1], 0.35, true)) {
+                coreHitWall = true;
+                break;
               }
             }
-            for (let s = 0; s < cave.rightWall.length - 1; s++) {
-              const res = collideCircleWithSegment(c.x, c.y, c.vx, c.vy, c.radius, cave.rightWall[s], cave.rightWall[s+1], 0.35, true);
-              if (res) {
-                c.x = res.x; c.y = res.y; c.vx = res.vx; c.vy = res.vy;
-                cameraShakeRef.current = Math.max(cameraShakeRef.current, Math.min(10, Math.abs(res.vx * 1.2)));
+            if (!coreHitWall) {
+              for (let s = 0; s < cave.rightWall.length - 1; s++) {
+                if (wallCollisionGrace && s >= 10) continue;
+                if (collideCircleWithSegment(c.x, c.y, c.vx, c.vy, c.radius, cave.rightWall[s], cave.rightWall[s+1], 0.35, true)) {
+                  coreHitWall = true;
+                  break;
+                }
               }
             }
 
-            // Heavy colliding on steel rotators
+            if (coreHitWall) {
+              triggerDeath(false);
+              return;
+            }
+
+            // Heavy colliding on steel rotators -> Trigger Game Over on moving obstacle contact
+            let coreHitRotator = false;
             hazards.rotators.forEach((rot) => {
               const halfL = rot.len / 2;
               const cos = Math.cos(rot.angle);
               const sin = Math.sin(rot.angle);
 
-              const p1 = {
-                x: rot.cx - cos * halfL,
-                y: rot.cy - sin * halfL
-              };
-              const p2 = {
-                x: rot.cx + cos * halfL,
-                y: rot.cy + sin * halfL
-              };
+              const p1 = { x: rot.cx - cos * halfL, y: rot.cy - sin * halfL };
+              const p2 = { x: rot.cx + cos * halfL, y: rot.cy + sin * halfL };
 
-              // Momentum calculation on rotating impact
-              const res = collideCircleWithSegment(c.x, c.y, c.vx, c.vy, c.radius, p1, p2, 0.45, true);
-              if (res) {
-                c.x = res.x; c.y = res.y;
-                
-                // Add velocity from rotating surface
-                // Vector perpendicular to radius
-                const dX = c.x - rot.cx;
-                const dY = c.y - rot.cy;
-                
-                // Rotational surface velocity: vt = omega * radius
-                const rotVx = -rot.speed * dY;
-                const rotVy = rot.speed * dX;
-
-                c.vx = res.vx + rotVx * 0.7;
-                c.vy = res.vy + rotVy * 0.7;
-
-                cameraShakeRef.current = Math.max(cameraShakeRef.current, Math.min(12, Math.abs(c.vx * 1.5)));
+              if (collideCircleWithSegment(c.x, c.y, c.vx, c.vy, c.radius, p1, p2, 0.45, true)) {
+                coreHitRotator = true;
               }
             });
 
-            // Hit explosive red barrels (Immediate detonation trigger)
+            if (coreHitRotator) {
+              triggerDeath(false);
+              return;
+            }
+
+            // Hit explosive red barrels (Immediate detonation trigger) -> Trigger Game Over
+            let coreHitBarrel = false;
             hazards.barrels.forEach((bar) => {
               const dx = c.x - bar.cx;
               const dy = c.y - bar.cy;
               const dist = Math.sqrt(dx * dx + dy * dy);
 
               if (dist < c.radius + bar.radius) {
-                triggerDeath(false);
+                coreHitBarrel = true;
               }
             });
+
+            if (coreHitBarrel) {
+              triggerDeath(false);
+              return;
+            }
 
             // Falling into the bottom abyss
             if (c.y > 750) {
               triggerDeath(true);
+              return;
             }
 
             // Reach upper industrial extraction region
             if (c.y < 115) {
               // Successfully harvested the Core!
-              setGameMode("SUCCESS_TRANSITION");
+              setGameModeWithRef("SUCCESS_TRANSITION");
               coreCapturedTimerRef.current = 65; // Transition countdown
               audioEngine.playSurge();
               audioEngine.setHum(0.0);
@@ -1146,7 +1408,7 @@ export default function App() {
             const botIdx = cave.leftWall.length - 1;
             const targetX = (cave.leftWall[botIdx].x + cave.rightWall[botIdx].x) / 2;
             c.x = targetX;
-            c.y = 635 + Math.sin(Date.now() * 0.0035) * 4; // Idle hovering bobbing effect
+            c.y = 500 + Math.sin(Date.now() * 0.0035) * 4; // Idle hovering bobbing effect
           }
         }
       }
@@ -1181,10 +1443,20 @@ export default function App() {
         }
 
         if (coreCapturedTimerRef.current <= 0) {
-          // Increment core level score metrics
-          const newScore = score + 1;
-          setScore(newScore);
-          setDepth(newScore * 12.5);
+          // Increment core level score metrics using a functional updater to avoid stale closure glitches
+          setScore((prevScore) => {
+            const newScore = prevScore + 1;
+            const currentTheme = getThemeForDepth(prevScore * 125);
+            const nextTheme = getThemeForDepth(newScore * 125);
+            if (nextTheme.name !== currentTheme.name) {
+              setMilestoneMessage(nextTheme.name);
+              setMilestoneSub(`DEPTH MILESTONE REACHED: ${nextTheme.minDepth}M`);
+              setShowMilestoneAlert(true);
+              audioEngine.playSurge();
+            }
+            setDepth(newScore * 125);
+            return newScore;
+          });
 
           // Generate next deeper segment assets
           const nextIdx = currentLevelIndexRef.current + 1;
@@ -1192,7 +1464,7 @@ export default function App() {
           nextHazardsRef.current = generateHazards(nextIdx, nextCaveRef.current);
 
           scrollProgressRef.current = 0.0;
-          setGameMode("SCROLLING");
+          setGameModeWithRef("SCROLLING");
         }
       }
 
@@ -1221,17 +1493,17 @@ export default function App() {
 
           coreRef.current = {
             x: startX,
-            y: 635,
+            y: 500,
             vx: 0,
             vy: 0,
             radius: 22
           };
 
           pulseRef.current = null;
-          phaseRef.current = "SLING";
+          setPhaseWithRef("SLING");
           scrollbarAndResetState();
 
-          setGameMode("PLAYING");
+          setGameModeWithRef("PLAYING");
         }
       }
 
@@ -1252,6 +1524,22 @@ export default function App() {
         return true;
       });
 
+      // Calculate smooth vertical camera tracking
+      let targetCameraY = 0;
+      if (gameModeRef.current === "PLAYING" || gameModeRef.current === "SUCCESS_TRANSITION") {
+        if (phaseRef.current === "LAUNCHED" && pulseRef.current) {
+          targetCameraY = pulseRef.current.y - 360;
+        } else if (phaseRef.current === "PULL" && coreRef.current) {
+          targetCameraY = coreRef.current.y - 360;
+        } else {
+          targetCameraY = 0;
+        }
+      } else {
+        targetCameraY = 0;
+      }
+      targetCameraY = Math.max(0, Math.min(380, targetCameraY));
+      cameraYRef.current += (targetCameraY - cameraYRef.current) * 0.12;
+
       // ==========================================
       // 6. MAIN HIGH-PERFORMANCE CANVAS RENDER
       // ==========================================
@@ -1264,12 +1552,23 @@ export default function App() {
         ctx.translate(shakeX, shakeY);
       }
 
-      // A. Draw solid midnight background
-      ctx.fillStyle = "#070a13";
+      // A. Draw solid background with dynamic color shifts matching depth zone milestones
+      const currentTheme = getThemeForDepth(currentLevelIndexRef.current * 125);
+      let bgThemeFill = currentTheme.gridColor;
+      let gridThemeStroke = currentTheme.gridlinesColor;
+
+      if (gameModeRef.current === "SCROLLING") {
+        const nextTheme = getThemeForDepth((currentLevelIndexRef.current + 1) * 125);
+        const progress = scrollProgressRef.current || 0;
+        bgThemeFill = lerpColor(currentTheme.gridColor, nextTheme.gridColor, progress);
+        gridThemeStroke = lerpColor(currentTheme.gridlinesColor, nextTheme.gridlinesColor, progress);
+      }
+
+      ctx.fillStyle = bgThemeFill;
       ctx.fillRect(0, 0, 1280, 720);
 
       // B. Draw Blueprint Gridlines
-      ctx.strokeStyle = "#121a2c";
+      ctx.strokeStyle = gridThemeStroke;
       ctx.lineWidth = 1;
       const gridSize = 80;
       for (let x = 0; x < 1280; x += gridSize) {
@@ -1293,8 +1592,12 @@ export default function App() {
         core: typeof coreRef.current,
         isSecondary: boolean
       ) => {
+        // Determine level depth and look up the custom milestone theme
+        const levelIdxVal = isSecondary ? (currentLevelIndexRef.current + 1) : currentLevelIndexRef.current;
+        const caveTheme = getThemeForDepth(levelIdxVal * 125);
+
         // 1. Fill outer slate-grey cavern boulders structure geometries
-        targetCtx.fillStyle = "#121622";
+        targetCtx.fillStyle = caveTheme.fillColor;
         
         // Left Cave Shell
         targetCtx.beginPath();
@@ -1311,10 +1614,10 @@ export default function App() {
         targetCtx.fill();
 
         // 2. High contrasting borders (Bright safety hazard orange decals)
-        targetCtx.strokeStyle = "#ea580c";
+        targetCtx.strokeStyle = caveTheme.borderColor;
         targetCtx.lineWidth = 4.5;
         targetCtx.shadowBlur = 10;
-        targetCtx.shadowColor = "rgba(234, 88, 12, 0.4)";
+        targetCtx.shadowColor = caveTheme.shadowColor;
 
         targetCtx.beginPath();
         targetCtx.moveTo(cave.leftWall[0].x, cave.leftWall[0].y);
@@ -1339,19 +1642,23 @@ export default function App() {
         const width = cradleRight - cradleLeft;
         const cx = cradleLeft + width / 2;
 
+        // Cradle visual position fits the active core target spawning coordinate (y=500)
+        const cradleY = 525; 
+        const stripeY = 529;
+
         targetCtx.fillStyle = "#1e293b";
-        targetCtx.fillRect(cx - 80, 660, 160, 15);
+        targetCtx.fillRect(cx - 80, cradleY, 160, 15);
         
         // Hazard black stripes pattern on cradle landing
         targetCtx.fillStyle = "#fbbf24";
-        targetCtx.fillRect(cx - 80, 660, 160, 4);
+        targetCtx.fillRect(cx - 80, cradleY, 160, 4);
         targetCtx.fillStyle = "#000000";
         for (let stripe = cx - 70; stripe < cx + 80; stripe += 25) {
           targetCtx.beginPath();
-          targetCtx.moveTo(stripe, 660);
-          targetCtx.lineTo(stripe - 10, 664);
-          targetCtx.lineTo(stripe, 664);
-          targetCtx.lineTo(stripe + 10, 660);
+          targetCtx.moveTo(stripe, cradleY);
+          targetCtx.lineTo(stripe - 10, stripeY);
+          targetCtx.lineTo(stripe, stripeY);
+          targetCtx.lineTo(stripe + 10, cradleY);
           targetCtx.fill();
         }
 
@@ -1359,9 +1666,9 @@ export default function App() {
         targetCtx.strokeStyle = "#475569";
         targetCtx.lineWidth = 3;
         targetCtx.beginPath();
-        targetCtx.moveTo(cx - 70, 664);
+        targetCtx.moveTo(cx - 70, stripeY);
         targetCtx.lineTo(cx - 100, 720);
-        targetCtx.moveTo(cx + 70, 664);
+        targetCtx.moveTo(cx + 70, stripeY);
         targetCtx.lineTo(cx + 100, 720);
         targetCtx.stroke();
 
@@ -1371,17 +1678,17 @@ export default function App() {
           targetCtx.translate(rot.cx, rot.cy);
           targetCtx.rotate(rot.angle);
 
-          // Render Core Hub Pivot
-          targetCtx.fillStyle = "#334155";
+           // Render Core Hub Pivot
+          targetCtx.fillStyle = caveTheme.hazardPivotColor;
           targetCtx.beginPath();
           targetCtx.arc(0, 0, 18, 0, Math.PI * 2);
           targetCtx.fill();
-          targetCtx.strokeStyle = "#ea580c";
+          targetCtx.strokeStyle = caveTheme.hazardColor;
           targetCtx.lineWidth = 3;
           targetCtx.stroke();
 
-          // Heavy Orange Steel Bar
-          targetCtx.fillStyle = "#ea580c";
+          // Heavy Dynamic Colored Danger Bar
+          targetCtx.fillStyle = caveTheme.hazardColor;
           targetCtx.fillRect(-rot.len / 2, -10, rot.len, 20);
 
           // Contrast Warning Stripes (Black hazard lines)
@@ -1422,7 +1729,7 @@ export default function App() {
           targetCtx.stroke();
 
           // Outer spinning shield rings
-          targetCtx.strokeStyle = "#06b6d4";
+          targetCtx.strokeStyle = caveTheme.borderColor;
           targetCtx.lineWidth = 2.5;
           targetCtx.save();
           targetCtx.translate(dis.cx, dis.cy);
@@ -1432,14 +1739,14 @@ export default function App() {
           targetCtx.stroke();
           
           targetCtx.rotate(-Date.now() * 0.0065);
-          targetCtx.strokeStyle = "#0891b2";
+          targetCtx.strokeStyle = caveTheme.hazardColor;
           targetCtx.beginPath();
           targetCtx.arc(0, 0, 31, 0, Math.PI * 1.25);
           targetCtx.stroke();
           targetCtx.restore();
 
           // Heavy magnetic center core
-          targetCtx.fillStyle = "#0284c7";
+          targetCtx.fillStyle = caveTheme.borderColor;
           targetCtx.beginPath();
           targetCtx.arc(dis.cx, dis.cy, 14, 0, Math.PI * 2);
           targetCtx.fill();
@@ -1498,6 +1805,10 @@ export default function App() {
         });
       };
 
+      // Translate the active level drawing smoothly with the scrolling camera
+      ctx.save();
+      ctx.translate(0, -cameraYRef.current);
+
       // C. RENDER TRANSLATED TILES ACCORDING TO SCROLL CINEMATICS
       if (gameModeRef.current === "SCROLLING" && nextCaveRef.current) {
         const offset = scrollProgressRef.current * 720;
@@ -1514,6 +1825,23 @@ export default function App() {
       } else {
         // Standard single active level
         drawLevel(ctx, currentCaveRef.current, currentHazardsRef.current, coreRef.current, false);
+      }
+
+      // Generate dynamic ambient sub-surface atmosphere emissions
+      if (Math.random() < 0.25 && particlesRef.current.length < 180) {
+        const theme = getThemeForDepth(currentLevelIndexRef.current * 125);
+        particlesRef.current.push({
+          id: particleIdCounterRef.current++,
+          x: Math.random() * 1280,
+          y: cameraYRef.current + 720 + Math.random() * 40, // Spawn relative to camera bottom
+          vx: (Math.random() - 0.5) * 1.6,
+          vy: -0.8 - Math.random() * 1.5, // Float upwards
+          size: 1.2 + Math.random() * 2.8,
+          color: theme.sparkColor,
+          alpha: 0.2 + Math.random() * 0.45,
+          decay: 0.002 + Math.random() * 0.005,
+          type: "spark"
+        });
       }
 
       // D. DRAW DUST/SPARK PARTICLES ENGINE
@@ -1756,6 +2084,9 @@ export default function App() {
         }
       }
 
+      // Restore active level coordinate translations
+      ctx.restore();
+
       // I. DRAW IMMOBILE UPPER EXTRACTION REGION (Stationary extraction zone)
       ctx.fillStyle = "rgba(4, 120, 87, 0.14)"; // Soft green safety corridor
       ctx.fillRect(0, 0, 1280, 115);
@@ -1850,24 +2181,7 @@ export default function App() {
       {/* BACKGROUND INDUSTRIAL GRID EFFECTS */}
       <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.15)_0%,rgba(2,6,23,0.85)_100%)] pointer-events-none" />
 
-      {/* PORTRAIT WARNING OVERLAY */}
-      {isPortrait && (
-        <div id="portrait-orientation-warning" className="fixed inset-0 z-50 bg-[#020617] flex flex-col items-center justify-center p-6 text-center animate-fade-in">
-          <div className="w-16 h-16 rounded-2xl bg-orange-500/10 border-2 border-orange-500 flex items-center justify-center text-orange-500 mb-6 shadow-[0_0_40px_rgba(249,115,22,0.25)] animate-bounce shrink-0">
-            <Smartphone className="w-8 h-8" />
-          </div>
-          <h2 className="text-2xl font-extrabold text-slate-100 tracking-tight uppercase mb-2">
-            Rotate Device to Landscape
-          </h2>
-          <p className="font-mono text-xs sm:text-sm text-orange-400 tracking-wider max-w-sm mb-6 leading-relaxed">
-            Rotate device to Landscape for optimal extraction and electromagnetic telemetry calibration.
-          </p>
-          <div className="w-16 h-0.5 border-t border-dashed border-slate-700 mb-5" />
-          <p className="text-[10px] text-slate-500 font-mono">
-            MAGNA-PULL INDUSTRIAL RETRIEVAL SYSTEM
-          </p>
-        </div>
-      )}
+
 
 
 
@@ -1906,6 +2220,7 @@ export default function App() {
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
           className="absolute w-full h-full cursor-crosshair active:scale-[0.999] transition-transform duration-75 outline-none"
           style={{ touchAction: "none" }}
         />
@@ -1924,9 +2239,9 @@ export default function App() {
                 <Radio className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-slate-400" />
                 <span className="opacity-60 hidden sm:inline">FIELD NODE:</span>
                 <span className="font-bold tracking-widest text-orange-400">
-                  {phaseRef.current === "SLING" && "READY"}
-                  {phaseRef.current === "LAUNCHED" && "PROBE"}
-                  {phaseRef.current === "PULL" && (isHoldingPullRef.current ? "ACTIVE" : "HOVER")}
+                  {phase === "SLING" && "READY"}
+                  {phase === "LAUNCHED" && "PROBE"}
+                  {phase === "PULL" && (isHoldingPullRef.current ? "ACTIVE" : "HOVER")}
                 </span>
               </div>
             </div>
@@ -1941,6 +2256,46 @@ export default function App() {
                 <span className="text-[7px] sm:text-[10px] text-slate-500 font-bold uppercase leading-none mb-0.5 sm:mb-1">DEPTH</span>
                 <span className="text-[11px] sm:text-sm font-bold text-[#fb923c] font-mono tracking-wider">{depth.toFixed(1)}M</span>
               </div>
+              <div className="bg-slate-950/85 border border-slate-800 text-slate-300 px-2 sm:px-3.5 py-1 sm:py-2 rounded-lg sm:rounded-xl backdrop-blur-md flex flex-col items-center justify-center shadow-lg hidden min-[450px]:flex">
+                <span className="text-[7px] sm:text-[10px] text-slate-500 font-bold uppercase leading-none mb-0.5 sm:mb-1">SECTOR</span>
+                <span className="text-[11px] sm:text-sm font-bold text-teal-400 font-mono tracking-wider uppercase truncate max-w-[130px]">{getThemeForDepth(depth).name}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==========================================
+            SUB-SURFACE SECTOR MILESTONE OVERLAY ALERT
+           ========================================== */}
+        {showMilestoneAlert && (
+          <div className="absolute inset-0 z-40 bg-slate-950/50 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 pointer-events-none transition-all animate-fade-in">
+            <div 
+              className="bg-slate-950/95 p-6 rounded-2xl flex flex-col items-center justify-center max-w-[500px] text-center border shadow-[0_0_50px_rgba(0,0,0,0.85)] animate-bounce"
+              style={{ borderColor: getThemeForDepth(depth).borderColor }}
+            >
+              <div 
+                className="w-12 h-12 rounded-full flex items-center justify-center mb-3 border animate-pulse"
+                style={{ 
+                  borderColor: getThemeForDepth(depth).borderColor,
+                  color: getThemeForDepth(depth).borderColor,
+                  boxShadow: `0 0 15px ${getThemeForDepth(depth).shadowColor}`
+                }}
+              >
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <span className="text-[10px] sm:text-xs font-mono font-bold tracking-[0.2em] text-slate-500 uppercase mb-1">
+                SECTOR UNLOCKED
+              </span>
+              <h2 
+                className="font-black text-lg sm:text-2xl uppercase tracking-tight mb-2"
+                style={{ color: getThemeForDepth(depth).borderColor }}
+              >
+                {milestoneMessage}
+              </h2>
+              <div className="h-[1px] w-32 bg-slate-800 mb-2"></div>
+              <p className="text-slate-400 font-mono text-[9px] sm:text-[11px] uppercase tracking-wider">
+                {milestoneSub}
+              </p>
             </div>
           </div>
         )}
@@ -2056,6 +2411,14 @@ export default function App() {
               </div>
             </div>
 
+            {/* Sector reached information */}
+            <div className={`mb-3 sm:mb-4 px-3 py-1 bg-slate-900/60 border border-slate-800/40 rounded-lg font-mono uppercase text-slate-400 tracking-wider flex items-center gap-1.5 shrink-0 ${isShortHeight ? 'text-[7px]' : 'text-[10px] sm:text-xs'}`}>
+              Sector Reached: 
+              <span className="font-extrabold animate-pulse" style={{ color: getThemeForDepth(depth).borderColor }}>
+                {getThemeForDepth(depth).name}
+              </span>
+            </div>
+
             {/* Action panel */}
             <div className="flex flex-col gap-1 items-center shrink-0">
               <button 
@@ -2068,7 +2431,7 @@ export default function App() {
               </button>
               
               <button 
-                onClick={() => setGameMode("TITLE")}
+                onClick={() => setGameModeWithRef("TITLE")}
                 className={`text-slate-400 hover:text-slate-200 font-mono uppercase rounded-lg transition-all cursor-pointer ${isShortHeight ? 'px-2 py-0.5 text-[6px]' : 'px-3 py-1 hover:bg-slate-900 border border-transparent hover:border-slate-800 text-[8px] sm:text-xs'}`}
               >
                 RETURN TO PRE-ENGAGEMENT TERMINAL
@@ -2078,7 +2441,7 @@ export default function App() {
         )}
 
         {/* ACTIVE HUD SYSTEM OPERATIONAL STATUS TAPE */}
-        {gameMode === "PLAYING" && phaseRef.current === "SLING" && (
+        {gameMode === "PLAYING" && phase === "SLING" && (
           <div className="absolute top-1/2 left-1/2 translate-x-[-50%] translate-y-[80px] sm:translate-y-[100px] pointer-events-none select-none z-10 text-center flex flex-col items-center">
             <span className="text-[8px] sm:text-[10px] font-mono text-orange-500/25 tracking-[0.35em] uppercase font-bold animate-pulse leading-none mb-1">MAGNET SLING UNIT READY</span>
             <span className="text-[10px] sm:text-[12px] font-sans text-slate-400/40 tracking-wider">Drag back anywhere to probe shaft</span>

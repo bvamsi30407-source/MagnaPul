@@ -1,6 +1,6 @@
 {
   "name": "Magna-Pull: Core Retrieval",
-  "description": "A high-performance physics-puzzle game. Sling magnetic pulses, deploy industrial magnets, and pull heavy energy cores through a hazardous procedurally generated cave.",
+  "description": "Abyssal Echoes: An atmospheric deep-sea stealth game. Pilot a research submarine through a pitch-black trench, avoiding blind apex predators that hunt by sound while retrieving bioluminescent relics.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
